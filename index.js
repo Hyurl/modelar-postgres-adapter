@@ -38,8 +38,7 @@ class PostgresAdapter extends Adapter {
                 sql += " returning *";
             // Replace ? to ${n} of the SQL.
             for (let i in bindings) {
-                i++;
-                sql = sql.replace("?", "$" + i);
+                sql = sql.replace("?", "$" + (i + 1));
             }
             return this.connection.query(sql, bindings).then(res => {
                 if (!(res instanceof Array)) {
