@@ -19,3 +19,8 @@ DB.init({
     password: "******"
 });
 ```
+
+## Warning
+
+If you want to use full fetures of modelar with this adapter, you must set an 
+`id` field for every table as its primary key.

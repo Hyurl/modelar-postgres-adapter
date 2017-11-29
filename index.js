@@ -1,5 +1,5 @@
 const { Pool } = require("pg");
-const Adapter = require("../Adapter");
+const Adapter = require("modelar/adapters/Adapter");
 const Pools = {};
 
 var getInsertId = (db, row, fields) => {
