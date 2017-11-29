@@ -1,0 +1,27 @@
+{
+    "name": "modelar-postgres-adapter",
+    "version": "0.1.0",
+    "description": "An adapter for Modelar to connect PostgreSQL database.",
+    "main": "index.js",
+    "scripts": {
+        "test": "node test"
+    },
+    "keywords": [
+        "Modelar",
+        "PostgreSQL",
+        "Adapter"
+    ],
+    "author": {
+        "name": "Ayon Lee",
+        "email": "i@hyurl.com",
+        "url": "hyurl.com"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/hyurl/modelar-postgres-adapter.git"
+    },
+    "license": "MIT",
+    "dependencies": {
+        "pg": "^7.4.0"
+    }
+}
