@@ -28,50 +28,44 @@ class PostgresAdapter extends Adapter {
     }
 
     query(db, sql, bindings) {
-        if (this.connection === null) {
-            return this.connect(db).then(db => {
-                return this.query(db, sql, bindings);
-            });
-        } else {
-            // Return the record when inserting.
-            if (db._command == "insert" && sql.search(/returning\s/) <= 0)
-                sql += " returning *";
-            // Replace ? to ${n} of the SQL.
-            for (let i in bindings) {
-                sql = sql.replace("?", "$" + (i + 1));
-            }
-            return this.connection.query(sql, bindings).then(res => {
-                if (!(res instanceof Array)) {
-                    db.affectedRows = res.rowCount || 0;
-                    if (db._command == "insert") {
-                        // Deal with insert statements.
-                        db.insertId = getInsertId(db, res.rows[0], res.fields);
-                    } else if (res.rows.length) {
-                        // Deal with other statements.
-                        db._data = res.rows.map(row => {
-                            return Object.assign({}, row);
-                        });
-                    }
+        // Return the record when inserting.
+        if (db._command == "insert" && sql.search(/returning\s/) <= 0)
+            sql += " returning *";
+        // Replace ? to ${n} of the SQL.
+        for (let i in bindings) {
+            sql = sql.replace("?", "$" + (parseInt(i) + 1));
+        }
+        return this.connection.query(sql, bindings).then(res => {
+            if (!(res instanceof Array)) {
+                db.affectedRows = res.rowCount || 0;
+                if (db._command == "insert") {
+                    // Deal with insert statements.
+                    db.insertId = getInsertId(db, res.rows[0], res.fields);
+                } else if (res.rows.length) {
+                    // Deal with other statements.
+                    db._data = res.rows.map(row => {
+                        return Object.assign({}, row);
+                    });
+                }
+            } else {
+                var _res = res[res.length - 1];
+                db.affectedRows = res.rowCount || 0;
+                if (db._command == "insert") {
+                    // Deal with insert statements.
+                    db.insertId = getInsertId(db, _res.rows[0], _res.fields);
                 } else {
-                    var _res = res[res.length - 1];
-                    db.affectedRows = res.rowCount || 0;
-                    if (db._command == "insert") {
-                        // Deal with insert statements.
-                        db.insertId = getInsertId(db, _res.rows[0], _res.fields);
-                    } else {
-                        db._data = [];
-                        for (let __res of res) {
-                            if (__res.rows.length) {
-                                db._data.push(__res.rows.map(row => {
-                                    return Object.assign({}, row);
-                                }));
-                            }
+                    db._data = [];
+                    for (let __res of res) {
+                        if (__res.rows.length) {
+                            db._data.push(__res.rows.map(row => {
+                                return Object.assign({}, row);
+                            }));
                         }
                     }
                 }
-                return db;
-            });
-        }
+            }
+            return db;
+        });
     }
 
     release() {
@@ -86,7 +80,7 @@ class PostgresAdapter extends Adapter {
             this.connection.end();
     }
 
-    closeAll() {
+    static close() {
         for (let i in Pools) {
             Pools[i].end();
             delete Pools[i];
@@ -114,10 +108,10 @@ class PostgresAdapter extends Adapter {
                 }
             }
             if (field.length instanceof Array) {
-                field.length = field.length.join(",");
-            }
-            if (field.length)
+                field.type += "(" + field.length.join(",") + ")";
+            } else if (field.length) {
                 field.type += "(" + field.length + ")";
+            }
 
             let column = table.backquote(field.name) + " " + field.type;
 
@@ -165,15 +159,10 @@ class PostgresAdapter extends Adapter {
 
     /** Methods for Query */
 
-    random(query) {
-        query._orderBy = "random()";
-        return query;
-    }
-
     limit(query, length, offset) {
         query._limit = offset ? length + " offset " + offset : length;
         return query;
     }
 }
 
-module.exports = new PostgresAdapter;
+module.exports = PostgresAdapter;
