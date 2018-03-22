@@ -81,13 +81,14 @@ class PostgresAdapter extends modelar_1.Adapter {
     }
     close() {
         if (this.connection) {
-            this.connection.end();
+            this.connection.release();
+            // this.connection.end();
             this.connection = null;
         }
     }
     static close() {
         for (let i in PostgresAdapter.Pools) {
-            PostgresAdapter.Pools[i].end().then();
+            PostgresAdapter.Pools[i].end();
             delete PostgresAdapter.Pools[i];
         }
     }

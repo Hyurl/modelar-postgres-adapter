@@ -1,5 +1,5 @@
 import { Adapter, DB, Table, Query } from "modelar";
-import { Pool, Client } from "pg";
+import { Pool, PoolClient } from "pg";
 
 function getInsertId(db: DB, row: object, fields: any[]): number {
     var primary: string = db["primary"] || "id";
@@ -13,7 +13,7 @@ function getInsertId(db: DB, row: object, fields: any[]): number {
 
 export class PostgresAdapter extends Adapter {
     backquote = "\"";
-    connection: Client;
+    connection: PoolClient;
 
     static Pools: { [dsn: string]: Pool } = {};
 
@@ -100,14 +100,15 @@ export class PostgresAdapter extends Adapter {
 
     close(): void {
         if (this.connection) {
-            this.connection.end();
+            this.connection.release();
+            // this.connection.end();
             this.connection = null;
         }
     }
 
     static close(): void {
         for (let i in PostgresAdapter.Pools) {
-            PostgresAdapter.Pools[i].end().then();
+            PostgresAdapter.Pools[i].end();
             delete PostgresAdapter.Pools[i];
         }
     }
