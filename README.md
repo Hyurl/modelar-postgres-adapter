@@ -1,7 +1,7 @@
 # Modelar-Postgres-Adapter
 
-**This is an adapter for [Modelar](http://modelar.hyurl.com) to connect**
-**PostgreSQL database.**
+**This is an adapter for [Modelar](https://github.com/hyurl/modelar) to** 
+**connect PostgreSQL database.**
 
 (This module is internally included by Modelar, you don't have to download it
 before using it.)
@@ -23,5 +23,5 @@ DB.init({
 
 ## Warning
 
-If you want to use full features of modelar with this adapter, you must set an 
+If you want to use full features of Modelar with this adapter, you must set an 
 `id` field for every table as its primary key.
