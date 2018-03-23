@@ -28,10 +28,8 @@ class PostgresAdapter extends modelar_1.Adapter {
     }
     query(db, sql, bindings) {
         var command = db.command;
-        // Return the record when inserting.
-        if (command == "insert" && sql.search(/returning\s/) <= 0)
+        if (command == "insert" && sql.search(/returning\s/i) <= 0)
             sql += " returning *";
-        // Replace ? to ${n} of the SQL.
         for (let i in bindings) {
             sql = sql.replace("?", "$" + (parseInt(i) + 1));
         }
@@ -39,11 +37,9 @@ class PostgresAdapter extends modelar_1.Adapter {
             if (!(res instanceof Array)) {
                 db.affectedRows = res.rowCount || 0;
                 if (command == "insert") {
-                    // Deal with insert statements.
                     db.insertId = getInsertId(db, res.rows[0], res.fields);
                 }
                 else if (res.rows.length) {
-                    // Deal with other statements.
                     let data = [];
                     for (let row of res.rows) {
                         data.push(Object.assign({}, row));
@@ -54,7 +50,6 @@ class PostgresAdapter extends modelar_1.Adapter {
             else {
                 db.affectedRows = res.rowCount || 0;
                 if (command == "insert") {
-                    // Deal with insert statements.
                     var _res = res[res.length - 1];
                     db.insertId = getInsertId(db, _res.rows[0], _res.fields);
                 }
@@ -82,7 +77,6 @@ class PostgresAdapter extends modelar_1.Adapter {
     close() {
         if (this.connection) {
             this.connection.release();
-            // this.connection.end();
             this.connection = null;
         }
     }
@@ -158,3 +152,4 @@ class PostgresAdapter extends modelar_1.Adapter {
 }
 PostgresAdapter.Pools = {};
 exports.PostgresAdapter = PostgresAdapter;
+//# sourceMappingURL=index.js.map

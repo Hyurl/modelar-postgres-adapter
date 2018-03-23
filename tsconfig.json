@@ -6,6 +6,10 @@
         "rootDir": "./src",
         "outDir": "./dist",
         "experimentalDecorators": true,
+        "sourceMap": true,
+        "removeComments": true,
+        "pretty": true,
+        "noUnusedParameters": true,
         "lib": [
             "es2015",
             "es2016.array.include"

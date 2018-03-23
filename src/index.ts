@@ -34,7 +34,7 @@ export class PostgresAdapter extends Adapter {
         var command = db.command;
 
         // Return the record when inserting.
-        if (command == "insert" && sql.search(/returning\s/) <= 0)
+        if (command == "insert" && sql.search(/returning\s/i) <= 0)
             sql += " returning *";
 
         // Replace ? to ${n} of the SQL.
