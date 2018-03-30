@@ -19,7 +19,10 @@ class PostgresAdapter extends modelar_1.Adapter {
     connect(db) {
         var dsn = db.dsn;
         if (PostgresAdapter.Pools[dsn] === undefined) {
-            PostgresAdapter.Pools[dsn] = new pg_1.Pool(db.config);
+            let config = Object.assign({}, db.config);
+            config.connectionTimeoutMillis = db.config.timeout;
+            config.idleTimeoutMillis = db.config.timeout;
+            PostgresAdapter.Pools[dsn] = new pg_1.Pool(config);
         }
         return PostgresAdapter.Pools[dsn].connect().then(client => {
             this.connection = client;

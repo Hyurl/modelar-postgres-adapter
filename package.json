@@ -1,6 +1,6 @@
 {
     "name": "modelar-postgres-adapter",
-    "version": "3.0.2",
+    "version": "3.0.3",
     "description": "An adapter for Modelar to connect PostgreSQL database.",
     "main": "dist/index.js",
     "types": "src/index.ts",

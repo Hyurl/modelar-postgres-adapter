@@ -1,5 +1,5 @@
 import { Adapter, DB, Table, Query } from "modelar";
-import { Pool, PoolClient } from "pg";
+import { Pool, PoolClient, PoolConfig } from "pg";
 
 function getInsertId(db: DB, row: object, fields: any[]): number {
     var primary: string = db["primary"] || "id";
@@ -21,7 +21,12 @@ export class PostgresAdapter extends Adapter {
         var dsn = db.dsn;
 
         if (PostgresAdapter.Pools[dsn] === undefined) {
-            PostgresAdapter.Pools[dsn] = new Pool(db.config);
+            let config: PoolConfig = <any>Object.assign({}, db.config);
+
+            config.connectionTimeoutMillis = db.config.timeout;
+            config.idleTimeoutMillis = db.config.timeout;
+
+            PostgresAdapter.Pools[dsn] = new Pool(config);
         }
 
         return PostgresAdapter.Pools[dsn].connect().then(client => {
