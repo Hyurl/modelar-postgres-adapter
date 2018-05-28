@@ -167,7 +167,7 @@ export class PostgresAdapter extends Adapter {
             if (field.comment)
                 column += " comment " + table.quote(field.comment);
 
-            if (field.foreignKey.table) {
+            if (field.foreignKey && field.foreignKey.table) {
                 let foreign = `foreign key (${table.backquote(field.name)})`
                     + " references " + table.backquote(field.foreignKey.table)
                     + " (" + table.backquote(field.foreignKey.field) + ")"
