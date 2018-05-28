@@ -1,5 +1,6 @@
 import { Adapter, DB, Table, Query } from "modelar";
 import { Pool, PoolClient, PoolConfig } from "pg";
+import assign = require("lodash/assign");
 
 function getInsertId(db: DB, row: object, fields: any[]): number {
     var primary: string = db["primary"] || "id";
@@ -9,7 +10,7 @@ function getInsertId(db: DB, row: object, fields: any[]): number {
             return row[field.name];
     }
     return 0;
-};
+}
 
 export class PostgresAdapter extends Adapter {
     backquote = "\"";
@@ -21,7 +22,7 @@ export class PostgresAdapter extends Adapter {
         var dsn = db.dsn;
 
         if (PostgresAdapter.Pools[dsn] === undefined) {
-            let config: PoolConfig = <any>Object.assign({}, db.config);
+            let config: PoolConfig = <any>assign({}, db.config);
 
             config.connectionTimeoutMillis = db.config.timeout;
             config.idleTimeoutMillis = db.config.timeout;
@@ -63,7 +64,7 @@ export class PostgresAdapter extends Adapter {
                     // Deal with other statements.
                     let data = [];
                     for (let row of res.rows) {
-                        data.push(Object.assign({}, row));
+                        data.push(assign({}, row));
                     }
                     db.data = data;
                 }
@@ -85,7 +86,7 @@ export class PostgresAdapter extends Adapter {
                     for (let __res of res) {
                         if (__res.rows.length) {
                             for (let row of res.rows) {
-                                data.push(Object.assign({}, row));
+                                data.push(assign({}, row));
                             }
                         }
                     }
@@ -127,9 +128,8 @@ export class PostgresAdapter extends Adapter {
 
         for (let key in table.schema) {
             let field = table.schema[key];
-            
             if (field.primary && field.autoIncrement) {
-                if (!serials.includes(field.type.toLowerCase())) {
+                if (serials.indexOf(field.type.toLowerCase()) === -1) {
                     field.type = "serial";
                 }
 
@@ -150,29 +150,29 @@ export class PostgresAdapter extends Adapter {
             if (field.primary)
                 primary = field.name;
 
+            if (field.unique)
+                column += " unique";
+
+            if (field.unsigned)
+                column += " unsigned";
+
+            if (field.notNull)
+                column += " not null";
+
             if (field.default === null)
                 column += " default null";
             else if (field.default !== undefined)
                 column += " default " + table.quote(field.default);
 
-            if (field.notNull)
-                column += " not null";
-
-            if (field.unsigned)
-                column += " unsigned";
-
-            if (field.unique)
-                column += " unique";
-
             if (field.comment)
                 column += " comment " + table.quote(field.comment);
 
             if (field.foreignKey.table) {
-                let foreign = `foreign key (${table.backquote(field.name)})` +
-                    " references " + table.backquote(field.foreignKey.table) +
-                    " (" + table.backquote(field.foreignKey.field) + ")" +
-                    " on delete " + field.foreignKey.onDelete +
-                    " on update " + field.foreignKey.onUpdate;
+                let foreign = `foreign key (${table.backquote(field.name)})`
+                    + " references " + table.backquote(field.foreignKey.table)
+                    + " (" + table.backquote(field.foreignKey.field) + ")"
+                    + " on delete " + field.foreignKey.onDelete
+                    + " on update " + field.foreignKey.onUpdate;
 
                 foreigns.push(foreign);
             };
@@ -184,7 +184,7 @@ export class PostgresAdapter extends Adapter {
             " (\n\t" + columns.join(",\n\t");
 
         if (primary)
-            sql += ",\n\tprimary key(" + table.backquote(primary) + ")";
+            sql += ",\n\tprimary key (" + table.backquote(primary) + ")";
 
         if (foreigns.length)
             sql += ",\n\t" + foreigns.join(",\n\t");

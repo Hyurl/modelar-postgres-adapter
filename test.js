@@ -1,5 +1,7 @@
 const { DB, Table, User } = require("modelar");
+const { PostgresAdapter } = require("modelar-postgres-adapter");
 
+DB.setAdapter("oracle", PostgresAdapter);
 DB.init({
     type: "postgres",
     database: "modelar",
