@@ -18,7 +18,7 @@ BUT since version 3.0.4, you must included manually.
 const { DB } = require("modelar");
 const { PostgresAdapter } = require("modelar-postgres-adapter");
 
-DB.setAdapter("oracle", PostgresAdapter);
+DB.setAdapter("postgres", PostgresAdapter);
 DB.init({
     type: "postgres",
     database: "modelar",
