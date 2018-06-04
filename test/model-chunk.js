@@ -31,7 +31,7 @@ describe("Model.prototype.chunk()", function () {
             }
 
             var offset = 0;
-            yield (new Model(null, modelConf)).use(db).whereIn("id", ids).chunk(5, function (models) {
+            yield (new Model(null, modelConf)).use(db).whereIn("id", ids).orderBy("id").chunk(5, function (models) {
                 for (var i in models) {
                     assert(models[i] instanceof Model);
                     assert.deepStrictEqual(models[i].data, Object.assign({

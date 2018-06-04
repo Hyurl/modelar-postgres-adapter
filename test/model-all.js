@@ -34,9 +34,10 @@ describe("Model.prototype.all()", function () {
             /** @type {Model[]} */
             var models = yield _model.use(db)
                 .whereIn("id", ids)
+                .orderBy("id")
                 .all();
 
-            assert.equal(_model.sql, 'select * from "users" where "id" in (' + Array(10).fill("?").join(", ") + ")");
+            assert.equal(_model.sql, 'select * from "users" where "id" in (' + Array(10).fill("?").join(", ") + ') order by "id"');
             assert.deepStrictEqual(_model.bindings, ids);
 
             for (var i in models) {

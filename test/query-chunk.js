@@ -26,11 +26,11 @@ describe("Query.prototype.chunk()", function () {
             var offset = 0,
                 firstId = 0;
 
-            yield query.whereIn("id", ids).chunk(5, function (_data) {
+            yield query.whereIn("id", ids).orderBy("id").chunk(5, function (_data) {
                 firstId = firstId || _data[0].id;
 
                 var limitStr = offset ? "5 offset " + offset : "5";
-                assert.equal(query.sql, 'select * from "users" where "id" in (' + Array(20).fill("?").join(", ") + ") limit " + limitStr);
+                assert.equal(query.sql, 'select * from "users" where "id" in (' + Array(20).fill("?").join(", ") + ') order by "id" limit ' + limitStr);
 
                 var expected = Array(5).fill({});
 

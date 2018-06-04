@@ -24,8 +24,8 @@ describe("Query.prototype.paginate()", function () {
                 ids.push(query.insertId);
             }
 
-            var res = yield query.whereIn("id", ids).limit(10).paginate(1);
-            assert.equal(query.sql, 'select * from "users" where "id" in (' + Array(20).fill("?").join(", ") + ") limit 10");
+            var res = yield query.whereIn("id", ids).orderBy("id").limit(10).paginate(1);
+            assert.equal(query.sql, 'select * from "users" where "id" in (' + Array(20).fill("?").join(", ") + ') order by "id" limit 10');
 
             var _data = Array(10).fill({});
             for (var i in _data) {
@@ -41,8 +41,8 @@ describe("Query.prototype.paginate()", function () {
                 data: _data
             });
 
-            var res2 = yield query2.whereIn("id", ids).paginate(3, 5);
-            assert.equal(query2.sql, 'select * from "users" where "id" in (' + Array(20).fill("?").join(", ") + ") limit 5 offset 10");
+            var res2 = yield query2.whereIn("id", ids).orderBy("id").paginate(3, 5);
+            assert.equal(query2.sql, 'select * from "users" where "id" in (' + Array(20).fill("?").join(", ") + ') order by "id" limit 5 offset 10');
 
             var _data = Array(5).fill({});
             for (var i in _data) {

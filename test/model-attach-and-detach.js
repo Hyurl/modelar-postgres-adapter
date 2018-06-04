@@ -36,13 +36,13 @@ describe("Model.prototype.attach() & Model.prototype.detach()", function () {
             var _role = user1.roles;
             var _user = role1.users;
             /** @type {Role[]} */
-            var roles = yield _role.all();
+            var roles = yield _role.orderBy("id").all();
             /** @type {User[]} */
-            var users = yield _user.all();
+            var users = yield _user.orderBy("id").all();
 
-            assert.equal(_role.sql, 'select * from "roles4" where "id" in (select "role_id" from "user_role" where "user_id" = ?)');
+            assert.equal(_role.sql, 'select * from "roles4" where "id" in (select "role_id" from "user_role" where "user_id" = ?) order by "id"');
             assert.deepStrictEqual(_role.bindings, [user1.id]);
-            assert.equal(_user.sql, 'select * from "users4" where "id" in (select "user_id" from "user_role" where "role_id" = ?)');
+            assert.equal(_user.sql, 'select * from "users4" where "id" in (select "user_id" from "user_role" where "role_id" = ?) order by "id"');
             assert.deepStrictEqual(_user.bindings, [role1.id]);
             assert.strictEqual(roles.length, 2);
             assert.strictEqual(users.length, 3);
@@ -58,8 +58,8 @@ describe("Model.prototype.attach() & Model.prototype.detach()", function () {
 
             var _role2 = user3.roles;
             /** @type {Role[]} */
-            var _roles = yield _role2.withPivot("activated").all();
-            assert.equal(_role2.sql, 'select "roles4".*, "user_role"."activated" from "roles4" inner join "user_role" on "user_role"."role_id" = "roles4"."id" where "id" in (select "role_id" from "user_role" where "user_id" = ?) and "user_role"."user_id" = ?');
+            var _roles = yield _role2.withPivot("activated").orderBy(_role2.table + ".id").all();
+            assert.equal(_role2.sql, 'select "roles4".*, "user_role"."activated" from "roles4" inner join "user_role" on "user_role"."role_id" = "roles4"."id" where "id" in (select "role_id" from "user_role" where "user_id" = ?) and "user_role"."user_id" = ? order by "roles4"."id"');
             assert.deepStrictEqual(_role2.bindings, [user3.id, user3.id]);
             assert.equal(_roles.length, 2);
 
@@ -77,8 +77,8 @@ describe("Model.prototype.attach() & Model.prototype.detach()", function () {
             data[role2.id] = { activated: 1 };
             yield user3.roles.attach(data);
 
-            roles = yield user1.roles.all();
-            _roles = yield user3.roles.withPivot("activated").all();
+            roles = yield user1.roles.orderBy("id").all();
+            _roles = yield user3.roles.withPivot("activated").orderBy(user3.roles.table + ".id").all();
 
             assert.equal(roles.length, 1);
             assert.equal(_roles.length, 2);
@@ -91,7 +91,7 @@ describe("Model.prototype.attach() & Model.prototype.detach()", function () {
 
             // update with models
             yield user1.roles.attach([role2]);
-            roles = yield user1.roles.all();
+            roles = yield user1.roles.orderBy("id").all();
             assert.equal(roles.length, 1);
             assert.deepStrictEqual(roles[0].data, role2.data);
 
@@ -99,7 +99,7 @@ describe("Model.prototype.attach() & Model.prototype.detach()", function () {
             yield user1.roles.detach([role2.id]);
             var hasError1 = false;
             try {
-                roles = yield user1.roles.all();
+                roles = yield user1.roles.orderBy("id").all();
             } catch (err) {
                 assert.equal(err.name, "NotFoundError");
                 hasError1 = true;
@@ -108,10 +108,10 @@ describe("Model.prototype.attach() & Model.prototype.detach()", function () {
 
             // detach with models
             yield user1.roles.attach([role1, role2]);
-            roles = yield user1.roles.all();
+            roles = yield user1.roles.orderBy("id").all();
             assert.equal(roles.length, 2);
             yield user1.roles.detach([role1]);
-            roles = yield user1.roles.all();
+            roles = yield user1.roles.orderBy("id").all();
             assert.equal(roles.length, 1);
             assert.deepStrictEqual(roles[0].data, role2.data);
 
@@ -119,7 +119,7 @@ describe("Model.prototype.attach() & Model.prototype.detach()", function () {
             yield user3.roles.detach();
             var hasError2 = false;
             try {
-                _roles = yield user3.roles.all();
+                _roles = yield user3.roles.orderBy("id").all();
             } catch (err) {
                 assert.equal(err.name, "NotFoundError");
                 hasError2 = true;

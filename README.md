@@ -32,7 +32,7 @@ DB.init({
 });
 ```
 
-## Warning
+## A Tip
 
 Since PostgreSQL doesn't return the last insert ID while running a insert 
 statement, this package uses a trick to compatible with Model requirements.
@@ -40,3 +40,7 @@ statement, this package uses a trick to compatible with Model requirements.
 In a model instance, the `insertId` will be the value of the primary key, but 
 other scenarios, you may need to set an `id` field for every table you want 
 the `insertId` to be available.
+
+In my experience, PostgreSQL doesn't order the records by id (the primary key) 
+by default like MySQL, so it's always better to explicitly calling 
+`query.orderBy()` when you're fetching multiple rows of records.

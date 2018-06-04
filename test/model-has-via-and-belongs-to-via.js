@@ -43,13 +43,13 @@ describe("Model.prototype.hasVia() & Model.prototype.belongsToVia()", function (
             var _role = user1.roles;
             var _user = role1.users;
             /** @type {Role[]} */
-            var roles = yield _role.all();
+            var roles = yield _role.orderBy("id").all();
             /** @type {User[]} */
-            var users = yield _user.all();
+            var users = yield _user.orderBy("id").all();
 
-            assert.equal(_role.sql, 'select * from "roles4" where "id" in (select "role_id" from "user_role" where "user_id" = ?)');
+            assert.equal(_role.sql, 'select * from "roles4" where "id" in (select "role_id" from "user_role" where "user_id" = ?) order by "id"');
             assert.deepStrictEqual(_role.bindings, [user1.id]);
-            assert.equal(_user.sql, 'select * from "users4" where "id" in (select "user_id" from "user_role" where "role_id" = ?)');
+            assert.equal(_user.sql, 'select * from "users4" where "id" in (select "user_id" from "user_role" where "role_id" = ?) order by "id"');
             assert.deepStrictEqual(_user.bindings, [role1.id]);
             assert.strictEqual(roles.length, 2);
             assert.strictEqual(users.length, 2);

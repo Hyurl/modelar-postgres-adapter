@@ -25,8 +25,8 @@ describe("Model.prototype.withPivot()", function () {
 
             var _role = user.roles;
             /** @type {Role[]} */
-            var roles = yield _role.withPivot("activated").all();
-            assert.equal(_role.sql, 'select "roles4".*, "user_role"."activated" from "roles4" inner join "user_role" on "user_role"."role_id" = "roles4"."id" where "id" in (select "role_id" from "user_role" where "user_id" = ?) and "user_role"."user_id" = ?');
+            var roles = yield _role.withPivot("activated").orderBy("id").all();
+            assert.equal(_role.sql, 'select "roles4".*, "user_role"."activated" from "roles4" inner join "user_role" on "user_role"."role_id" = "roles4"."id" where "id" in (select "role_id" from "user_role" where "user_id" = ?) and "user_role"."user_id" = ? order by "id"');
             assert.deepStrictEqual(_role.bindings, [user.id, user.id]);
             assert.strictEqual(roles.length, 2);
             assert.deepStrictEqual(roles[0].data, role1.data);

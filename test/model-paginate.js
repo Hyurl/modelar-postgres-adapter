@@ -32,7 +32,9 @@ describe("Model.prototype.paginate()", function () {
 
             var offset = 0;
 
-            return (new Model(null, modelConf)).use(db).whereIn("id", ids)
+            return (new Model(null, modelConf)).use(db)
+                .whereIn("id", ids)
+                .orderBy("id")
                 .paginate(1, 5).then(function (res) {
                     var info = Object.assign({}, res),
                         models = res.data;
