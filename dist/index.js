@@ -23,10 +23,11 @@ var PostgresAdapter = (function (_super) {
     PostgresAdapter.prototype.connect = function (db) {
         var _this = this;
         var dsn = db.dsn;
+        var config = assign({}, db.config);
         if (PostgresAdapter.Pools[dsn] === undefined) {
-            var config = assign({}, db.config);
             config.connectionTimeoutMillis = db.config.timeout;
             config.idleTimeoutMillis = db.config.timeout;
+            config["statement_timeout"] = db.config.timeout;
             PostgresAdapter.Pools[dsn] = new pg_1.Pool(config);
         }
         return PostgresAdapter.Pools[dsn].connect().then(function (client) {
@@ -47,7 +48,7 @@ var PostgresAdapter = (function (_super) {
                 if (command == "insert") {
                     db.insertId = getInsertId(db, res.rows[0], res.fields);
                 }
-                else if (res.rows.length) {
+                else if (res.rows.length || command == "select") {
                     var data = [];
                     for (var _i = 0, _a = res.rows; _i < _a.length; _i++) {
                         var row = _a[_i];
@@ -65,8 +66,8 @@ var PostgresAdapter = (function (_super) {
                 else {
                     var data = [];
                     for (var _b = 0, res_1 = res; _b < res_1.length; _b++) {
-                        var __res = res_1[_b];
-                        if (__res.rows.length) {
+                        var _res = res_1[_b];
+                        if (_res.rows.length) {
                             for (var _c = 0, _d = res.rows; _c < _d.length; _c++) {
                                 var row = _d[_c];
                                 data.push(assign({}, row));
@@ -108,8 +109,10 @@ var PostgresAdapter = (function (_super) {
                     field.type = "serial";
                 }
                 field.length = 0;
-                if (field.autoIncrement instanceof Array) {
-                    autoIncrement = "alter sequence " + table.name + "_" + field.name + "_seq restart with " + field.autoIncrement[0];
+                if (field.autoIncrement instanceof Array && field.autoIncrement[0] > 1) {
+                    autoIncrement = "alter sequence "
+                        + table.backquote(table.name + "_" + field.name + "_seq")
+                        + " restart with " + field.autoIncrement[0];
                 }
             }
             if (field.length instanceof Array) {
@@ -164,4 +167,5 @@ var PostgresAdapter = (function (_super) {
     return PostgresAdapter;
 }(modelar_1.Adapter));
 exports.PostgresAdapter = PostgresAdapter;
+exports.default = PostgresAdapter;
 //# sourceMappingURL=index.js.map

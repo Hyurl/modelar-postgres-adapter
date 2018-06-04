@@ -5,7 +5,7 @@
     "main": "dist/index.js",
     "types": "src/index.ts",
     "scripts": {
-        "test": "node test"
+        "test": "mocha"
     },
     "keywords": [
         "Modelar",
@@ -24,12 +24,18 @@
     "license": "MIT",
     "dependencies": {
         "@types/lodash": "^4.14.109",
-        "@types/pg": "^7.4.5",
+        "@types/pg": "^7.4.9",
         "lodash": "^4.17.10",
-        "pg": "^7.4.0",
-        "tslib": "^1.9.1"
+        "modelar": "^3.0.5",
+        "pg": "^7.4.3",
+        "tslib": "^1.9.2"
     },
     "engines": {
         "node": ">=4.5.0"
+    },
+    "devDependencies": {
+        "@types/mocha": "^5.2.1",
+        "co": "^4.6.0",
+        "mocha": "^5.2.0"
     }
 }

@@ -1,0 +1,10 @@
+language: node_js
+sudo: yes
+node_js:
+  - '4.5'
+  - 'stable'
+services:
+  - postgresql
+before_install:
+  - psql -U postgres -c 'create database travis_ci_test;'
+  - psql -U postgres -d modelar -f ./modelar.sql

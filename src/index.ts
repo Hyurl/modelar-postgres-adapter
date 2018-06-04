@@ -20,12 +20,13 @@ export class PostgresAdapter extends Adapter {
 
     connect(db: DB): Promise<DB> {
         var dsn = db.dsn;
+        let config: PoolConfig = <any>assign({}, db.config);
 
         if (PostgresAdapter.Pools[dsn] === undefined) {
-            let config: PoolConfig = <any>assign({}, db.config);
 
             config.connectionTimeoutMillis = db.config.timeout;
             config.idleTimeoutMillis = db.config.timeout;
+            config["statement_timeout"] = db.config.timeout;
 
             PostgresAdapter.Pools[dsn] = new Pool(config);
         }
@@ -48,19 +49,13 @@ export class PostgresAdapter extends Adapter {
             sql = sql.replace("?", "$" + (parseInt(i) + 1));
         }
 
-        return this.connection.query(sql, bindings).then((res: {
-            command: string,
-            oid: number,
-            rowCount: number,
-            rows: any[],
-            fields: any[]
-        }) => {
+        return this.connection.query(sql, bindings).then(res => {
             if (!(res instanceof Array)) {
                 db.affectedRows = res.rowCount || 0;
                 if (command == "insert") {
                     // Deal with insert statements.
                     db.insertId = getInsertId(db, res.rows[0], res.fields);
-                } else if (res.rows.length) {
+                } else if (res.rows.length || command == "select") {
                     // Deal with other statements.
                     let data = [];
                     for (let row of res.rows) {
@@ -73,18 +68,12 @@ export class PostgresAdapter extends Adapter {
 
                 if (command == "insert") {
                     // Deal with insert statements.
-                    var _res: {
-                        command: string,
-                        oid: number,
-                        rowCount: number,
-                        rows: any[],
-                        fields: any[]
-                    } = <any>res[res.length - 1];
+                    let _res = res[res.length - 1];
                     db.insertId = getInsertId(db, _res.rows[0], _res.fields);
                 } else {
                     let data = [];
-                    for (let __res of res) {
-                        if (__res.rows.length) {
+                    for (let _res of res) {
+                        if (_res.rows.length) {
                             for (let row of res.rows) {
                                 data.push(assign({}, row));
                             }
@@ -134,8 +123,10 @@ export class PostgresAdapter extends Adapter {
                 }
 
                 field.length = 0;
-                if (field.autoIncrement instanceof Array) {
-                    autoIncrement = `alter sequence ${table.name}_${field.name}_seq restart with ${field.autoIncrement[0]}`;
+                if (field.autoIncrement instanceof Array && field.autoIncrement[0] > 1) {
+                    autoIncrement = "alter sequence "
+                        + table.backquote(table.name + "_" + field.name + "_seq")
+                        + " restart with " + field.autoIncrement[0];
                 }
             }
 
@@ -203,3 +194,5 @@ export class PostgresAdapter extends Adapter {
         return query;
     }
 }
+
+export default PostgresAdapter;
