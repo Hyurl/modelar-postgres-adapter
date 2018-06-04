@@ -20,7 +20,7 @@ describe("Table.prototype.create() and Table.prototype.drop()", function () {
                 "\t\"content\" text,",
                 "\tprimary key (\"id\")",
                 ");",
-                'alter sequence "articles_id_seq" restart with 100'
+                'alter sequence "articles_id_seq" start with 100'
             ].join("\n"));
         }).then(function () {
             return table.drop();

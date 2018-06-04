@@ -123,10 +123,17 @@ export class PostgresAdapter extends Adapter {
                 }
 
                 field.length = 0;
-                if (field.autoIncrement instanceof Array && field.autoIncrement[0] > 1) {
-                    autoIncrement = "alter sequence "
-                        + table.backquote(table.name + "_" + field.name + "_seq")
-                        + " restart with " + field.autoIncrement[0];
+                if (field.autoIncrement instanceof Array) {
+                    let name = table.name + "_" + field.name + "_seq",
+                        increment = field.autoIncrement[1],
+                        start = field.autoIncrement[0];
+
+                    if (increment > 1 || start > 1) {
+                        autoIncrement = "alter sequence "
+                            + table.backquote(name)
+                            + (increment > 1 ? " increment by " + increment : "")
+                            + (start > 1 ? " start with " + start : "");
+                    }
                 }
             }
 
