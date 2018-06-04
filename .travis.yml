@@ -6,5 +6,5 @@ node_js:
 services:
   - postgresql
 before_install:
-  - psql -U postgres -c 'create database travis_ci_test;'
+  - psql -U postgres -c 'create database modelar;'
   - psql -U postgres -d modelar -f ./modelar.sql
