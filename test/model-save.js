@@ -27,9 +27,6 @@ describe("Model.prototype.save()", function () {
             assert.deepStrictEqual(model.data, Object.assign({ id: id }, data));
             model.name = "Luna";
             model.email = "luna@hyurl.com";
-            model.on("query", function () {
-                console.log(model.sql, model.bindings);
-            })
             return model.save();
         }).then(function () {
             assert.deepStrictEqual(model.data, Object.assign({id: id}, data, {

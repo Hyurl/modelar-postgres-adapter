@@ -36,7 +36,7 @@ describe("Model.prototype.all()", function () {
                 .whereIn("id", ids)
                 .all();
 
-            assert.equal(_model.sql, "select * from \"users\" where \"id\" in (" + Array(10).fill("?").join(", ") + ")");
+            assert.equal(_model.sql, 'select * from "users" where "id" in (' + Array(10).fill("?").join(", ") + ")");
             assert.deepStrictEqual(_model.bindings, ids);
 
             for (var i in models) {

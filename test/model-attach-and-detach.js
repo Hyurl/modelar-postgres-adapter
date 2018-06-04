@@ -99,9 +99,7 @@ describe("Model.prototype.hasVia() & Model.prototype.belongsToVia()", function (
             yield user1.roles.detach([role2.id]);
             var hasError1 = false;
             try {
-                var _role = user1.roles;
-                roles = yield _role.all();
-                console.log(_role);process.exit(1);
+                roles = yield user1.roles.all();
             } catch (err) {
                 assert.equal(err.name, "NotFoundError");
                 hasError1 = true;
